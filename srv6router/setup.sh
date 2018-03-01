@@ -83,13 +83,6 @@ install_iproute2
 
 echo -e "Ok!"
 
-# Enable IPv6 forwarding and Seg6 forwarding
-echo -e "\nEnabling IPv6 forwarding"
-sysctl -w net.ipv6.conf.all.forwarding=1
-
-echo -e "\nEnabling Seg6 forwarding"
-sysctl -w net.ipv6.conf.all.seg6_enabled=1
-
 # Create setup file
 touch /etc/setup
 

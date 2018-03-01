@@ -13,6 +13,17 @@ echo "############################################################"
 MGMT=172.17.0.1
 QUAGGA_PATH="/usr/lib/quagga"
 
+# Setup properly IPv6
+ipv6_setup() {
+  echo -e "\nConfiguring IPv6"
+  for i in ${TAP[@]}; do
+    # Enable IPv6 forwarding
+    sysctl -w net.ipv6.conf.$i.forwarding=1
+    # Enable Seg6
+    sysctl -w net.ipv6.conf.$i.seg6_enabled=1
+  done
+}
+
 # Create quagga setup
 quagga_setup() {
   echo -e "\nConfiguring Quagga"
@@ -69,7 +80,10 @@ ipv6 ospf6 hello-interval $quaggahellointerval\n" >> /etc/quagga/ospf6d.conf
 
   # Enable ospf6 and other general config
   echo -e "router ospf6" >> /etc/quagga/ospf6d.conf
-  echo -e "router-id $ROUTERID\n" >> /etc/quagga/ospf6d.conf
+  echo -e "router-id $ROUTERID" >> /etc/quagga/ospf6d.conf
+  echo -e "redistribute static" >> /etc/quagga/ospf6d.conf
+  echo -e "redistribute kernel\n" >> /etc/quagga/ospf6d.conf
+
   # Add the net to the config
   for i in ${OSPFNET[@]}; do
     eval quaggaannouncednet=\${${i}[0]}
@@ -261,6 +275,9 @@ echo -e "\nConfiguring Quagga"
 zebra_setup
 ospf6d_setup
 quagga_setup
+
+# Configure IPv6
+ipv6_setup
 
 echo -e "\nSRv6 Router node config ended succesfully. Enjoy!\n"
 
