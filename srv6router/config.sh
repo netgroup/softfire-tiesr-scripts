@@ -11,6 +11,105 @@ echo "############################################################"
 
 # Address of the management server
 MGMT=172.17.0.1
+QUAGGA_PATH="/usr/lib/quagga"
+
+# Create quagga setup
+quagga_setup() {
+  echo -e "\nConfiguring Quagga"
+  # Enable the right Quagga daemons
+  sed -i -e 's/zebra=no/zebra=yes/g' /etc/quagga/daemons
+  sed -i -e 's/ospfd=no/ospfd=yes/g' /etc/quagga/daemons
+  echo "babeld=no" >> /etc/quagga/daemons
+
+  # Generate the proper config for the vtysh
+  echo "!
+!service integrated-vtysh-config
+hostname $HOST
+username root $ROUTERPWD
+!" > /etc/quagga/vtysh.conf
+
+  # Set proper permissions to the quagga folder
+  chown quagga:quaggavty /etc/quagga/*.conf
+  chmod 640 /etc/quagga/*.conf
+
+  # Do not display end of sign after each command
+  VTYSH_PAGER=more > /etc/environment
+
+  # Let's finally start the daemons
+  $QUAGGA_PATH/zebra -d
+  $QUAGGA_PATH/ospfd -d
+}
+
+# Create ospfd setup
+ospfd_setup() {
+  echo -e "\nConfiguring Ospf"
+  # Initially create the conf with just lo iface
+  # and general options
+  echo -e "! -*- ospf -*-
+!
+hostname $HOST
+password $ROUTERPWD
+log file /var/log/quagga/ospfd.log\n
+interface lo
+ospf cost ${LOOPBACK[1]}
+ospf hello-interval ${LOOPBACK[2]}\n" > /etc/quagga/ospfd.conf
+
+  # Iterate over the interfaces and
+  # add them to the config file
+  for i in ${TAP[@]}; do
+    if [ "$TUNNELING" = "OpenVPN" ]; then
+      eval quaggaospfcost=\${${i}[4]}
+      eval quaggahellointerval=\${${i}[5]}
+    elif [ "$TUNNELING" = "VXLAN" ]; then
+      # Create config files for the taps and setup the tunnels
+      eval quaggaospfcost=\${${i}[3]}
+      eval quaggahellointerval=\${${i}[4]}
+    fi
+    echo -e "interface $i
+ospf cost $quaggaospfcost
+ospf hello-interval $quaggahellointerval\n" >> /etc/quagga/ospfd.conf
+  done
+
+  # Add the net to the config
+  echo -e "router ospf\n" >> /etc/quagga/ospfd.conf
+  for i in ${OSPFNET[@]}; do
+    eval quaggaannouncednet=\${${i}[0]}
+    eval quaggarouterarea=\${${i}[1]}
+    echo "network $quaggaannouncednet area $quaggarouterarea" >> /etc/quagga/ospfd.conf
+  done
+}
+
+# Create zebra setup
+zebra_setup() {
+  echo -e "\nConfiguring Zebra"
+  # Initially create the conf with just lo iface
+  # and general options
+  echo -e "
+! -*- zebra -*-
+log file /var/log/quagga/zebra.log\n
+hostname $HOST
+password ${ROUTERPWD}
+enable password ${ROUTERPWD}
+
+interface lo
+ip address $LOOPBACK
+link-detect" > /etc/quagga/zebra.conf
+
+  # Iterate over the interfaces and
+  # add them to the config file
+  for i in ${TAP[@]}; do
+    if [ "$TUNNELING" = "OpenVPN" ]; then
+      eval addr=\${${i}[3]}
+    elif [ "$TUNNELING" = "VXLAN" ]; then
+      # Create config files for the taps and setup the tunnels
+      eval addr=\${${i}[2]}
+    fi
+    echo -e "
+interface ${i}
+ip address $addr
+link-detect" >> /etc/quagga/zebra.conf
+    done
+}
 
 # Create vxlan setup
 vxlan_setup() {
@@ -145,6 +244,21 @@ elif [ "$TUNNELING" = "VXLAN" ]; then
   # Create config files for the taps and setup the tunnels
   vxlan_setup
 fi
+
+# Let's configure routing daemon
+echo -e "\nConfiguring Quagga"
+zebra_setup
+ospfd_setup
+quagga_setup
+
+# Enable IPv4 forwarding
+echo -e "\nEnabling Linux forwarding"
+echo "1" > /proc/sys/net/ipv4/ip_forward
+echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
+
+# Disable Linux RPF check
+echo -e "\nDisabling Linux RPF"
+sysctl -w "net.ipv4.conf.all.rp_filter=0"
 
 echo -e "\nSRv6 Router node config ended succesfully. Enjoy!\n"
 
