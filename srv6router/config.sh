@@ -3,10 +3,10 @@
 
 echo -e "\n"
 echo "############################################################"
-echo "##                 SRv6 Router node setup                 ##"
+echo "##                 SRv6 Router node config                ##"
 echo "##                                                        ##"
-echo "##    The installation process can last many minutes.     ##"
-echo "##   Plase wait and do not interrupt the setup process.   ##"
+echo "##       The config process can last many minutes.        ##"
+echo "##   Plase wait and do not interrupt the config process.  ##"
 echo "############################################################"
 
 # Address of the management server
@@ -16,11 +16,6 @@ QUAGGA_PATH="/usr/lib/quagga"
 # Create quagga setup
 quagga_setup() {
   echo -e "\nConfiguring Quagga"
-  # Enable the right Quagga daemons
-  sed -i -e 's/zebra=no/zebra=yes/g' /etc/quagga/daemons
-  sed -i -e 's/ospfd=no/ospfd=yes/g' /etc/quagga/daemons
-  echo "babeld=no" >> /etc/quagga/daemons
-
   # Generate the proper config for the vtysh
   echo "!
 !service integrated-vtysh-config
@@ -36,23 +31,25 @@ username root $ROUTERPWD
   VTYSH_PAGER=more > /etc/environment
 
   # Let's finally start the daemons
+  echo -e "\nStarting Zebra"
   $QUAGGA_PATH/zebra -d
-  $QUAGGA_PATH/ospfd -d
+  echo -e "\nStarting Ospf6d"
+  $QUAGGA_PATH/ospf6d -d
 }
 
-# Create ospfd setup
-ospfd_setup() {
-  echo -e "\nConfiguring Ospf"
+# Create ospf6d setup
+ospf6d_setup() {
+  echo -e "\nConfiguring Ospf6"
   # Initially create the conf with just lo iface
   # and general options
-  echo -e "! -*- ospf -*-
+  echo -e "! -*- ospf6 -*-
 !
 hostname $HOST
 password $ROUTERPWD
-log file /var/log/quagga/ospfd.log\n
+log file /var/log/quagga/ospf6d.log\n
 interface lo
-ospf cost ${LOOPBACK[1]}
-ospf hello-interval ${LOOPBACK[2]}\n" > /etc/quagga/ospfd.conf
+ipv6 ospf6 cost ${LOOPBACK[1]}
+ipv6 ospf6 hello-interval ${LOOPBACK[2]}\n" > /etc/quagga/ospf6d.conf
 
   # Iterate over the interfaces and
   # add them to the config file
@@ -66,16 +63,23 @@ ospf hello-interval ${LOOPBACK[2]}\n" > /etc/quagga/ospfd.conf
       eval quaggahellointerval=\${${i}[4]}
     fi
     echo -e "interface $i
-ospf cost $quaggaospfcost
-ospf hello-interval $quaggahellointerval\n" >> /etc/quagga/ospfd.conf
+ipv6 ospf6 cost $quaggaospfcost
+ipv6 ospf6 hello-interval $quaggahellointerval\n" >> /etc/quagga/ospf6d.conf
   done
 
+  # Enable ospf6 and other general config
+  echo -e "router ospf6" >> /etc/quagga/ospf6d.conf
+  echo -e "router-id $ROUTERID\n" >> /etc/quagga/ospf6d.conf
   # Add the net to the config
-  echo -e "router ospf\n" >> /etc/quagga/ospfd.conf
   for i in ${OSPFNET[@]}; do
     eval quaggaannouncednet=\${${i}[0]}
     eval quaggarouterarea=\${${i}[1]}
-    echo "network $quaggaannouncednet area $quaggarouterarea" >> /etc/quagga/ospfd.conf
+    echo "area $quaggarouterarea range $quaggaannouncednet" >> /etc/quagga/ospf6d.conf
+  done
+  # Define the area of the interfaces
+  echo -e "interface lo area 0.0.0.0" >> /etc/quagga/ospf6d.conf
+  for i in ${TAP[@]}; do
+     echo -e "interface $i area 0.0.0.0" >> /etc/quagga/ospf6d.conf
   done
 }
 
@@ -92,22 +96,29 @@ password ${ROUTERPWD}
 enable password ${ROUTERPWD}
 
 interface lo
-ip address $LOOPBACK
-link-detect" > /etc/quagga/zebra.conf
+link-detect
+ipv6 nd ra-interval 10
+ipv6 address $LOOPBACK
+ipv6 nd prefix $LOOPBACK" > /etc/quagga/zebra.conf
 
   # Iterate over the interfaces and
   # add them to the config file
   for i in ${TAP[@]}; do
     if [ "$TUNNELING" = "OpenVPN" ]; then
       eval addr=\${${i}[3]}
+      eval prefix=\${!$i[6]}
     elif [ "$TUNNELING" = "VXLAN" ]; then
       # Create config files for the taps and setup the tunnels
       eval addr=\${${i}[2]}
+      eval prefix=\${!$i[5]}
     fi
     echo -e "
 interface ${i}
-ip address $addr
-link-detect" >> /etc/quagga/zebra.conf
+link-detect
+no ipv6 nd suppress-ra
+ipv6 nd ra-interval 10
+ipv6 address $addr
+ipv6 nd prefix $prefix" >> /etc/quagga/zebra.conf
     done
 }
 
@@ -248,17 +259,8 @@ fi
 # Let's configure routing daemon
 echo -e "\nConfiguring Quagga"
 zebra_setup
-ospfd_setup
+ospf6d_setup
 quagga_setup
-
-# Enable IPv4 forwarding
-echo -e "\nEnabling Linux forwarding"
-echo "1" > /proc/sys/net/ipv4/ip_forward
-echo "net.ipv4.ip_forward = 1" >> /etc/sysctl.conf
-
-# Disable Linux RPF check
-echo -e "\nDisabling Linux RPF"
-sysctl -w "net.ipv4.conf.all.rp_filter=0"
 
 echo -e "\nSRv6 Router node config ended succesfully. Enjoy!\n"
 
