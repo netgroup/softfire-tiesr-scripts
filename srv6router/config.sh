@@ -9,6 +9,7 @@ echo "##       The config process can last many minutes.        ##"
 echo "##   Plase wait and do not interrupt the config process.  ##"
 echo "############################################################"
 
+$INTERF_NAME="eth0"
 # Address of the management server
 MGMT=172.17.0.1
 QUAGGA_PATH="/usr/lib/quagga"
@@ -227,8 +228,8 @@ if [ "$(id -u)" != "0" ]; then
 fi
 echo -e "Ok!"
 
-# Get ip address of eth0
-myip=$(ip a show dev eth0 | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
+# Get ip address of $INTERF_NAME
+myip=$(ip a show dev $INTERF_NAME | grep -Eo 'inet (addr:)?([0-9]*\.){3}[0-9]*' | grep -Eo '([0-9]*\.){3}[0-9]*' | grep -v '127.0.0.1')
 # First step is the download of the right configuration file
 echo -e "\nLooking for a valid configuration file $myip.cfg"
 # if myip.cfg does not exist we try to download from the server
