@@ -9,7 +9,7 @@ echo "##       The config process can last many minutes.        ##"
 echo "##   Plase wait and do not interrupt the config process.  ##"
 echo "############################################################"
 
-$INTERF_NAME="eth0"
+INTERF_NAME="eth0"
 # Address of the management server
 MGMT=172.17.0.1
 QUAGGA_PATH="/usr/lib/quagga"
