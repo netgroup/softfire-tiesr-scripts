@@ -12,7 +12,8 @@ echo "############################################################"
 INTERF_NAME="eth0"
 # Address of the management server
 MGMT=172.17.0.1
-QUAGGA_PATH="/usr/lib/quagga"
+QUAGGA_PATH="/usr/sbin"
+#QUAGGA_PATH="/usr/lib/quagga"
 
 # Setup properly IPv6
 ipv6_setup() {
@@ -34,6 +35,13 @@ quagga_setup() {
 hostname $HOST
 username root $ROUTERPWD
 !" > /etc/quagga/vtysh.conf
+
+  #create folders and set permissions
+  mkdir -p /var/log/quagga
+  chown quagga:quagga /var/log/quagga
+
+  mkdir -p /var/run/quagga
+  chown quagga:quagga /var/run/quagga
 
   # Set proper permissions to the quagga folder
   chown quagga:quaggavty /etc/quagga/*.conf
