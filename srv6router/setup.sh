@@ -13,6 +13,20 @@ install_quagga(){
   apt install -y gawk
   apt install -y texinfo
   apt install -y quagga
+
+  #create folders and set permissions
+  mkdir -p /var/log/quagga
+  chown quagga:quagga /var/log/quagga
+
+  mkdir -p /var/run/quagga
+  chown quagga:quagga /var/run/quagga
+
+  # Set proper permissions to the quagga folder
+  #chown quagga:quaggavty /etc/quagga/*.conf
+  chown quagga:quaggavty /etc/quagga/*.conf
+  chmod 640 /etc/quagga/*.conf
+
+  
 }
 
 install_iproute2(){
