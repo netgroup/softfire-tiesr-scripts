@@ -41,7 +41,7 @@ The following is an example of configuration files for two nodes using OpenVPN a
 	declare -a OSPFNET=(NET1 NET2 NET3)
 	declare -a NET1=(2000::AC10:0001/128 0.0.0.0)
 	declare -a NET2=(2001:0:0:0::/64 0.0.0.0)
-	declare -a NET3=(2002:0:0:1::/64)
+	declare -a NET3=(2002:0:0:1::/64 0.0.0.0)
 
 	#!/bin/bash
 	TESTBED=SOFTFIRE
@@ -78,7 +78,7 @@ The following is an example of configuration files for two nodes using VXLAN as 
 	declare -a OSPFNET=(NET1 NET2 NET3)
 	declare -a NET1=(2000::AC10:0001/128 0.0.0.0)
 	declare -a NET2=(2001:0:0:0::/64 0.0.0.0)
-	declare -a NET3=(2002:0:0:1::/64)
+	declare -a NET3=(2002:0:0:1::/64 0.0.0.0)
 
 	#!/bin/bash
 	TESTBED=SOFTFIRE
@@ -93,7 +93,7 @@ The following is an example of configuration files for two nodes using VXLAN as 
 	declare -a TAP=(tap1)
 	declare -a tap1=(1 endip1 2001:0:0:0::2/64 1 1 NET2)
 	declare -a endip1=(172.18.0.2 eth1)
-	declare -a OSPFNET=(NET1 NET2 NET3)
+	declare -a OSPFNET=(NET1 NET2)
 	declare -a NET1=(2000::AC10:0002/128 0.0.0.0)
 	declare -a NET2=(2001:0:0:0::/64 0.0.0.0)
 
