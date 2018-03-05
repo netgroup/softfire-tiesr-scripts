@@ -36,17 +36,6 @@ hostname $HOST
 username root $ROUTERPWD
 !" > /etc/quagga/vtysh.conf
 
-  #create folders and set permissions
-  mkdir -p /var/log/quagga
-  chown quagga:quagga /var/log/quagga
-
-  mkdir -p /var/run/quagga
-  chown quagga:quagga /var/run/quagga
-
-  # Set proper permissions to the quagga folder
-  chown quagga:quaggavty /etc/quagga/*.conf
-  chmod 640 /etc/quagga/*.conf
-
   # Do not display end of sign after each command
   VTYSH_PAGER=more > /etc/environment
 
