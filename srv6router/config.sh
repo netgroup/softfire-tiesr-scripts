@@ -172,7 +172,6 @@ openvpn_setup() {
 mode p2p
 port $localport
 remote $remoteaddr $remoteport
-script-security 3 system
 daemon" > /etc/openvpn/$i.conf
   done
 

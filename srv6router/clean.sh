@@ -9,6 +9,14 @@ echo "##        The clean process can last many minutes.        ##"
 echo "##   Plase wait and do not interrupt the clean process.   ##"
 echo "############################################################"
 
+# Make sure only root can run our script
+echo -e "\nChecking permission"
+if [ "$(id -u)" != "0" ]; then
+   echo -e "This script must be run as root\n" 1>&2
+   exit 1
+fi
+echo -e "Ok!"
+
 # Reset tunnels
 if [ $(ip link show | grep tap | wc -l) -gt 0 ]; then
 	echo -e "\nTurning off tap interfaces"
