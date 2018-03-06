@@ -87,8 +87,8 @@ fi
 echo -e "\nRemoving loopback address"
 ip addr del $(ip a show dev lo | grep "scope global" | awk '{split($0,a," "); print a[2]}') dev lo
 
-echo -e "\nRestarting network services"
-/etc/init.d/networking restart
+#echo -e "\nRestarting network services"
+#/etc/init.d/networking restart
 
 echo -e "\nSRv6 Router node clean ended succesfully. Enjoy!\n"
 
