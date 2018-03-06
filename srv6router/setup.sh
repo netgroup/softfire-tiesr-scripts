@@ -100,7 +100,10 @@ echo -e "Ok!"
 # Create setup file
 touch /etc/setup
 
+echo -e 'MYNAME="ADS1"' > /etc/myhostid
+
 echo -e "\nSRv6 Router node setup ended succesfully. Enjoy!\n"
+
 
 EXIT_SUCCESS=0
 exit $EXIT_SUCCESS
