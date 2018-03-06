@@ -41,46 +41,48 @@ if [ $(ps aux | grep quagga | wc -l) -gt 1 ]
 	pkill ospf6d
 fi
 echo -e "\nReset of zebra.conf file"
-cp /usr/share/doc/quagga/examples/zebra.conf.sample /etc/quagga/zebra.conf
+#cp /usr/share/doc/quagga/examples/zebra.conf.sample /etc/quagga/zebra.conf
+rm /etc/quagga/zebra.conf
 echo -e "\nReset of ospf6d.conf file"
-cp /usr/share/doc/quagga/examples/ospf6d.conf.sample /etc/quagga/ospf6d.conf
+#cp /usr/share/doc/quagga/examples/ospf6d.conf.sample /etc/quagga/ospf6d.conf
+rm /etc/quagga/ospf6d.conf
 echo -e "\nReset of vtysh.conf file"
 if [ -f /etc/quagga/vtysh.conf ]; then
     rm /etc/quagga/vtysh.conf
 fi
 
 # Reset static routes
-declare -a remoteaddr
-declare -a interfaces
-counter=1
-endofcounter=$(($(route -n | grep UH | wc -l) + 1))
-while [ $counter -lt $endofcounter ]; do
-        arraycounter=$(($counter-1))
-        interfaces[$arraycounter]=$(route -n | grep UH | sed -n "$counter p" | awk '{split($0,a," "); print a[8]}')
-        remoteaddr[$arraycounter]=$(route -n | grep UH | sed -n "$counter p" | awk '{split($0,a," "); print a[1]}')
-		let counter=counter+1
-done
+#declare -a remoteaddr
+#declare -a interfaces
+#counter=1
+#endofcounter=$(($(route -n | grep UH | wc -l) + 1))
+#while [ $counter -lt $endofcounter ]; do
+#        arraycounter=$(($counter-1))
+#        interfaces[$arraycounter]=$(route -n | grep UH | sed -n "$counter p" | awk '{split($0,a," "); print a[8]}')
+#        remoteaddr[$arraycounter]=$(route -n | grep UH | sed -n "$counter p" | awk '{split($0,a," "); print a[1]}')
+#		let counter=counter+1
+#done
 
-echo -e "\nRemoving static routes"
-for (( i=0; i<${#interfaces[@]}; i++ )); do
-	route del -host ${remoteaddr[$i]} dev ${interfaces[$i]}
-done
-unset interfaces
+#echo -e "\nRemoving static routes"
+#for (( i=0; i<${#interfaces[@]}; i++ )); do
+#	route del -host ${remoteaddr[$i]} dev ${interfaces[$i]}
+#done
+#unset interfaces
 
 # Deactivating unuseful interfaces (except management interface eth0) with ip link set ethX down
-unset interfaces
-declare -a interfaces
-counter=1
-endofcounter=$(($(ip link show | grep -e "eth[^0e]" | wc -l) + 1))
-while [ $counter -lt $endofcounter ]; do
-        arraycounter=$(($counter-1))
-        interfaces[$arraycounter]=$(ip link show | grep -e "eth[^0e]" | sed -n "$counter p" | awk '{split($0,a," "); print a[2]}' | awk '{split($0,a,"@"); print a[1]}')
-        let counter=counter+1
-done
-echo -e "\nDeactivating physical interfaces"
-for (( i=0; i<${#interfaces[@]}; i++ )); do
-	ip link set ${interfaces[$i]} down
-done
+#unset interfaces
+#declare -a interfaces
+#counter=1
+#endofcounter=$(($(ip link show | grep -e "eth[^0e]" | wc -l) + 1))
+#while [ $counter -lt $endofcounter ]; do
+#        arraycounter=$(($counter-1))
+#        interfaces[$arraycounter]=$(ip link show | grep -e "eth[^0e]" | sed -n "$counter p" | awk '{split($0,a," "); print a[2]}' | awk '{split($0,a,"@"); print a[1]}')
+#        let counter=counter+1
+#done
+#echo -e "\nDeactivating physical interfaces"
+#for (( i=0; i<${#interfaces[@]}; i++ )); do
+#	ip link set ${interfaces[$i]} down
+#done
 
 echo -e "\nRemoving loopback address"
 ip addr del $(ip a show dev lo | grep "scope global" | awk '{split($0,a," "); print a[2]}') dev lo
