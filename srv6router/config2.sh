@@ -9,6 +9,8 @@ echo "##       The config process can last many minutes.        ##"
 echo "##   Plase wait and do not interrupt the config process.  ##"
 echo "############################################################"
 
+source /etc/myhostid
+
 #INTERF_NAME="eth0"
 # Address of the management server
 MGMT=172.17.0.1
