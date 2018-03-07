@@ -95,6 +95,9 @@ install_quagga
 echo -e "\nInstalling iproute2"
 install_iproute2
 
+echo -e "\nInstalling traceroute"
+apt install traceroute
+
 echo -e "Ok!"
 
 # Create setup file
