@@ -37,7 +37,7 @@ quagga_setup() {
   # Generate the proper config for the vtysh
   echo "!
 !service integrated-vtysh-config
-hostname $HOST
+hostname $MYNAME
 username root $ROUTERPWD
 !" > /etc/quagga/vtysh.conf
 
@@ -58,7 +58,7 @@ ospf6d_setup() {
   # and general options
   echo -e "! -*- ospf6 -*-
 !
-hostname $HOST
+hostname $MYNAME
 password $ROUTERPWD
 log file /var/log/quagga/ospf6d.log\n
 interface lo
@@ -108,7 +108,7 @@ zebra_setup() {
   echo -e "
 ! -*- zebra -*-
 log file /var/log/quagga/zebra.log\n
-hostname $HOST
+hostname $MYNAME
 password ${ROUTERPWD}
 enable password ${ROUTERPWD}
 
@@ -188,6 +188,8 @@ daemon" > /etc/openvpn/$i.conf
 }
 
 # Setup properly the interfaces on the machine
+# THIS NOT CALLED NOW, BECAUSE THERE IS NO NEED TO SETUP STATIC ROUTES
+# TO FORCE THE EXIT INTERFACE
 setup_interfaces () {
   # Tunneling is not used, just bring up the interfaces
   for i in ${INTERFACES[@]}; do
