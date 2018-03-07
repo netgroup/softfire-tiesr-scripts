@@ -20,6 +20,9 @@ QUAGGA_PATH="/usr/sbin"
 # Setup properly IPv6
 ipv6_setup() {
   echo -e "\nConfiguring IPv6"
+  # Enable IPv6 forwarding
+  sysctl -w net.ipv6.conf.all.forwarding=1
+  sysctl -w net.ipv6.conf.all.seg6_enabled=1
   for i in ${TAP[@]}; do
     # Enable IPv6 forwarding
     sysctl -w net.ipv6.conf.$i.forwarding=1
