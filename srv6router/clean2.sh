@@ -53,7 +53,8 @@ DEV_NAME=$5
 BR_NAME=$6$1
 
 #cleaning of namespace
-
+echoeval ip link delete dev ${BR_NAME}
+echoeval ip netns del ${VNF_NAME}
 }
 
 

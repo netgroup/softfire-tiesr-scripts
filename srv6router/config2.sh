@@ -69,15 +69,21 @@ echoeval sudo ip link set dev $BR_NAME up
 
 
 netns () {
-
 VNF_NAME=$1
 GW_IP=$2
 NETMASK=$3
 VNF_IP=$4
 DEV_NAME=$5
 BR_NAME=$6$1
-
-
+echoeval ip netns add ${VNF_NAME}
+echoeval ip link add ${BR_NAME} type veth peer name ${DEV_NAME}
+echoeval ip link set ${DEV_NAME} netns ${VNF_NAME}
+echoeval ifconfig ${BR_NAME} up
+echoeval ip netns exec ${VNF_NAME} ifconfig ${DEV_NAME} up
+echoeval ip netns exec ${VNF_NAME} sysctl -w net.ipv6.conf.all.forwarding=1
+echoeval ip -6 addr add ${GW_IP}/${NETMASK} dev ${BR_NAME}
+echoeval ip netns exec ${VNF_NAME} ip -6 addr add ${VNF_IP}/${NETMASK} dev ${DEV_NAME}
+echoeval ip netns exec ${VNF_NAME} ip -6 route add default via ${GW_IP}
 }
 
 
