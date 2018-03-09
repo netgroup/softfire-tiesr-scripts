@@ -60,6 +60,22 @@ lxc exec $VNF_NAME -- ip link set dev $DEV_NAME up
 sudo ip link set dev $BR_NAME up
 }
 
+
+#declare -a VNF1=(LXD vnf1 VNF1_IFS)
+#declare -a VNF1_DEV=(VNF1_IF1)
+#declare -a VNF1_DEV1=(L3 fd01:f1::fe 32 fd01:f1::1 $VNF_IF)
+
+vnfs_terms_setup () {
+  echo "VNFs and TERMs SETUP"
+  for i in ${VNF[@]}; do
+    
+    eval myvnf=\${${i}[0]}
+    echo $nyvnf
+    #eval remoteport=\${${i}[1]}
+    #eval remoteaddr=\${!$i[2]}
+}
+
+
 # Create quagga setup
 quagga_setup() {
   echo -e "\nConfiguring Quagga"
@@ -313,6 +329,10 @@ quagga_setup
 
 # Configure IPv6
 ipv6_setup
+
+# Configure VNFs and terminals
+vnfs_terms_setup
+
 
 echo -e "\nSRv6 Router node config ended succesfully. Enjoy!\n"
 
