@@ -17,6 +17,12 @@ MGMT=172.17.0.1
 QUAGGA_PATH="/usr/sbin"
 #QUAGGA_PATH="/usr/lib/quagga"
 
+echoeval () {
+		echo "$@"
+		eval "$@"
+}
+
+
 # Setup properly IPv6
 ipv6_setup() {
   echo -e "\nConfiguring IPv6"
@@ -31,40 +37,39 @@ ipv6_setup() {
   done
 }
 
-# $1=vnf1 $2=fd04:f1::fe $3=32 $4=fd04:f1::1 $5=eth0
+# $1=vnf1 $2=fd04:f1::fe $3=32 $4=fd04:f1::1 $5=eth0 $6=br0
 lxd_container () {
 
 VNF_NAME=$1
-GW_IP=$1
+GW_IP=$2
 NETMASK=$3
 VNF_IP=$4
 DEV_NAME=$5
-
-BR_NAME=br$VNF_NAME
+BR_NAME=$6$1
 
 #lxc network detach brvnf vnf1
-lxc network detach $BR_NAME $VNF_NAME
+echoeval lxc network detach $BR_NAME $VNF_NAME
 #lxc network delete brvnf1 
-lxc network delete $BR_NAME 
+echoeval lxc network delete $BR_NAME 
 #lxc network create brvnf1 ipv6.address=fd04:f1::fe/32 ipv4.address=none 
-lxc network create $BR_NAME ipv6.address=$GW_IP/$NETMASK ipv4.address=none 
+echoeval lxc network create $BR_NAME ipv6.address=$GW_IP/$NETMASK ipv4.address=none 
 #lxc network attach brvnf1 vnf1 eth0
-lxc network attach $BR_NAME $VNF_NAME $DEV_NAME
+echoeval lxc network attach $BR_NAME $VNF_NAME $DEV_NAME
 #lxc exec vnf1 -- ip -6 a a  fd04:f1::1/32 dev eth0
-lxc exec $VNF_NAME -- ip -6 a a  $VNF_IP/$NETMASK dev $DEV_NAME
+echoeval lxc exec $VNF_NAME -- ip -6 a a  $VNF_IP/$NETMASK dev $DEV_NAME
 #lxc exec vnf1 -- ip -6 r a default via fd04:f1::fe dev eth0
-lxc exec $VNF_NAME -- ip -6 r a default via $GW_IP dev $DEV_NAME
+echoeval lxc exec $VNF_NAME -- ip -6 r a default via $GW_IP dev $DEV_NAME
 #lxc exec vnf1 -- ip link set dev eth0 up
-lxc exec $VNF_NAME -- ip link set dev $DEV_NAME up
+echoeval lxc exec $VNF_NAME -- ip link set dev $DEV_NAME up
 #sudo ip link set dev vnfbr1 up
-sudo ip link set dev $BR_NAME up
+echoeval sudo ip link set dev $BR_NAME up
 }
 
 
 #declare -a VNF1=(lxd vnf1 VNF1_DEV)
 #declare -a VNF1_DEV=(VNF1_DEV1 VNF2_DEV2)
-#declare -a VNF1_DEV1=(L3 fd01:f1::fe 32 fd01:f1::1 $VNF_IF)
-#declare -a VNF1_DEV2=(L3 fd01:f8::fe 32 fd01:f8::1 eth1)
+#declare -a VNF1_DEV1=(L3 fd01:f1::fe 32 fd01:f1::1 $VNF_IF br1)
+#declare -a VNF1_DEV2=(L3 fd01:f8::fe 32 fd01:f8::1 eth1 br2)
 
 #declare -a VNF2=(lxd vnf2 VNF2_DEV)
 #declare -a VNF2_DEV=(VNF2_DEV1)
@@ -75,30 +80,37 @@ vnfs_terms_setup () {
   for i in ${VNF[@]}; do
 
     eval TYPE_VNF_TERM=\${${i}[0]}
-    echo $TYPE_VNF_TERM
+    #echo $TYPE_VNF_TERM
     eval VNF_NAME=\${${i}[1]}
-    echo $VNF_NAME
+    #echo $VNF_NAME
     eval VNF_DEV=\${${i}[2]}
-    echo $VNF_DEV
+    #echo $VNF_DEV
 
     tmp=$VNF_DEV[@]
     DEVARRAY=( "${!tmp}" )
-    echo ${DEVARRAY[@]}
+    #echo ${DEVARRAY[@]}
 
     for j in ${DEVARRAY[@]}; do
       eval LAYER=\${$DEVARRAY[0]}
-      echo $LAYER
+      #echo $LAYER
       eval IP_GW=\${$DEVARRAY[1]}
-      echo $IP_GW
+      #echo $IP_GW
       eval NETMASK=\${$DEVARRAY[2]}
-      echo $NETMASK
+      #echo $NETMASK
       eval IP_VNF=\${$DEVARRAY[3]}
-      echo $IP_VNF
+      #echo $IP_VNF
       eval DEV_NAME=\${$DEVARRAY[4]}
-      echo $DEV_NAME
+      #echo $DEV_NAME
+      eval BR_NAME=\${$DEVARRAY[5]}
+      #echo $BR_NAME
+
+      if [ "$TYPE_VNF_TERM" = "lxd" ]; then
+        lxd_container $VNF_NAME $IP_GW $NETMASK $IP_VNF $DEV_NAME $BR_NAME
+      elif [ "$TYPE_VNF_TERM" = "netns" ]; then
+        netns $VNF_NAME $IP_GW $NETMASK $IP_VNF $DEV_NAME $BR_NAME
+      fi
 
     done
-
 
   done
 }
