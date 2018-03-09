@@ -61,18 +61,45 @@ sudo ip link set dev $BR_NAME up
 }
 
 
-#declare -a VNF1=(LXD vnf1 VNF1_IFS)
-#declare -a VNF1_DEV=(VNF1_IF1)
+#declare -a VNF1=(lxd vnf1 VNF1_DEV)
+#declare -a VNF1_DEV=(VNF1_DEV1 VNF2_DEV2)
 #declare -a VNF1_DEV1=(L3 fd01:f1::fe 32 fd01:f1::1 $VNF_IF)
+#declare -a VNF1_DEV2=(L3 fd01:f8::fe 32 fd01:f8::1 eth1)
+
+#declare -a VNF2=(lxd vnf2 VNF2_DEV)
+#declare -a VNF2_DEV=(VNF2_DEV1)
+#declare -a VNF2_DEV1=(L3 fd01:f2::fe 32 fd01:f2::1 $VNF_IF)
 
 vnfs_terms_setup () {
   echo "VNFs and TERMs SETUP"
   for i in ${VNF[@]}; do
-    
-    eval myvnf=\${${i}[0]}
-    echo $nyvnf
-    #eval remoteport=\${${i}[1]}
-    #eval remoteaddr=\${!$i[2]}
+
+    eval TYPE_VNF_TERM=\${${i}[0]}
+    echo $TYPE_VNF_TERM
+    eval VNF_NAME=\${${i}[1]}
+    echo $VNF_NAME
+    eval VNF_DEV=\${${i}[2]}
+    echo $VNF_DEV
+
+    tmp=$VNF_DEV[@]
+    DEVARRAY=( "${!tmp}" )
+    echo ${DEVARRAY[@]}
+
+    for j in ${DEVARRAY[@]}; do
+      eval LAYER=\${$DEVARRAY[0]}
+      echo $LAYER
+      eval IP_GW=\${$DEVARRAY[1]}
+      echo $IP_GW
+      eval NETMASK=\${$DEVARRAY[2]}
+      echo $NETMASK
+      eval IP_VNF=\${$DEVARRAY[3]}
+      echo $IP_VNF
+      eval DEV_NAME=\${$DEVARRAY[4]}
+      echo $DEV_NAME
+
+    done
+
+
   done
 }
 
