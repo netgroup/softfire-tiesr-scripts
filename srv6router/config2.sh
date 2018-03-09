@@ -73,6 +73,7 @@ vnfs_terms_setup () {
     echo $nyvnf
     #eval remoteport=\${${i}[1]}
     #eval remoteaddr=\${!$i[2]}
+  done
 }
 
 
