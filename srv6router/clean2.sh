@@ -11,6 +11,11 @@ echo "############################################################"
 
 source /etc/myhostid
 
+echoeval () {
+		echo "$@"
+		eval "$@"
+}
+
 # Make sure only root can run our script
 echo -e "\nChecking permission"
 if [ "$(id -u)" != "0" ]; then
