@@ -9,6 +9,8 @@ echo "##        The clean process can last many minutes.        ##"
 echo "##   Plase wait and do not interrupt the clean process.   ##"
 echo "############################################################"
 
+source /etc/myhostid
+
 # Make sure only root can run our script
 echo -e "\nChecking permission"
 if [ "$(id -u)" != "0" ]; then
@@ -16,6 +18,65 @@ if [ "$(id -u)" != "0" ]; then
    exit 1
 fi
 echo -e "Ok!"
+
+# $1=vnf1 $2=fd04:f1::fe $3=32 $4=fd04:f1::1 $5=eth0 $6=br0
+lxd_container () {
+
+VNF_NAME=$1
+GW_IP=$2
+NETMASK=$3
+VNF_IP=$4
+DEV_NAME=$5
+BR_NAME=$6$1
+
+#lxc network detach brvnf vnf1
+echoeval lxc network detach $BR_NAME $VNF_NAME
+#lxc network delete brvnf1 
+echoeval lxc network delete $BR_NAME 
+}
+
+
+### THIS CODE IS DUPLICATED FROM SETUP2:SH ###############
+vnfs_terms_setup () {
+  echo "VNFs and TERMs SETUP"
+  for i in ${VNF[@]}; do
+
+    eval TYPE_VNF_TERM=\${${i}[0]}
+    #echo $TYPE_VNF_TERM
+    eval VNF_NAME=\${${i}[1]}
+    #echo $VNF_NAME
+    eval VNF_DEV=\${${i}[2]}
+    #echo $VNF_DEV
+
+    tmp=$VNF_DEV[@]
+    DEVARRAY=( "${!tmp}" )
+    #echo ${DEVARRAY[@]}
+
+    for j in ${DEVARRAY[@]}; do
+      eval LAYER=\${$DEVARRAY[0]}
+      #echo $LAYER
+      eval IP_GW=\${$DEVARRAY[1]}
+      #echo $IP_GW
+      eval NETMASK=\${$DEVARRAY[2]}
+      #echo $NETMASK
+      eval IP_VNF=\${$DEVARRAY[3]}
+      #echo $IP_VNF
+      eval DEV_NAME=\${$DEVARRAY[4]}
+      #echo $DEV_NAME
+      eval BR_NAME=\${$DEVARRAY[5]}
+      #echo $BR_NAME
+
+      if [ "$TYPE_VNF_TERM" = "lxd" ]; then
+        lxd_container $VNF_NAME $IP_GW $NETMASK $IP_VNF $DEV_NAME $BR_NAME
+      elif [ "$TYPE_VNF_TERM" = "netns" ]; then
+        netns $VNF_NAME $IP_GW $NETMASK $IP_VNF $DEV_NAME $BR_NAME
+      fi
+
+    done
+
+  done
+}
+
 
 # Reset tunnels
 if [ $(ip link show | grep tap | wc -l) -gt 0 ]; then
@@ -94,6 +155,9 @@ fi
 
 echo -e "\nRemoving loopback address"
 ip addr del $(ip a show dev lo | grep "scope global" | awk '{split($0,a," "); print a[2]}') dev lo
+
+# Clean VNFs and terminals
+vnfs_terms_setup
 
 #echo -e "\nRestarting network services"
 #/etc/init.d/networking restart
