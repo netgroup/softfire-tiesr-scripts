@@ -31,6 +31,35 @@ ipv6_setup() {
   done
 }
 
+# $1=vnf1 $2=fd04:f1::fe $3=32 $4=fd04:f1::1 $5=eth0
+lxd_container () {
+
+VNF_NAME=$1
+GW_IP=$1
+NETMASK=$3
+VNF_IP=$4
+DEV_NAME=$5
+
+BR_NAME=br$VNF_NAME
+
+#lxc network detach brvnf vnf1
+lxc network detach $BR_NAME $VNF_NAME
+#lxc network delete brvnf1 
+lxc network delete $BR_NAME 
+#lxc network create brvnf1 ipv6.address=fd04:f1::fe/32 ipv4.address=none 
+lxc network create $BR_NAME ipv6.address=$GW_IP/$NETMASK ipv4.address=none 
+#lxc network attach brvnf1 vnf1 eth0
+lxc network attach $BR_NAME $VNF_NAME $DEV_NAME
+#lxc exec vnf1 -- ip -6 a a  fd04:f1::1/32 dev eth0
+lxc exec $VNF_NAME -- ip -6 a a  $VNF_IP/$NETMASK dev $DEV_NAME
+#lxc exec vnf1 -- ip -6 r a default via fd04:f1::fe dev eth0
+lxc exec $VNF_NAME -- ip -6 r a default via $GW_IP dev $DEV_NAME
+#lxc exec vnf1 -- ip link set dev eth0 up
+lxc exec $VNF_NAME -- ip link set dev $DEV_NAME up
+#sudo ip link set dev vnfbr1 up
+sudo ip link set dev $BR_NAME up
+}
+
 # Create quagga setup
 quagga_setup() {
   echo -e "\nConfiguring Quagga"
