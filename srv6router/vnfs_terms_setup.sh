@@ -1,5 +1,13 @@
 #!/bin/bash
 
+
+#EXAMPLES OF CONFIGURATION LINES
+#declare -a VNF=(VNF1 VNF2)
+#declare -a VNF1=(lxd vnf1 VNF1_DEV)
+#declare -a VNF1_DEV=(VNF1_DEV1 VNF2_DEV2)
+#declare -a VNF1_DEV1=(L3 fd01:f1::fe 32 fd01:f1::1 $VNF_IF br1)
+#declare -a VNF1_DEV2=(L3 fd01:f8::fe 32 fd01:f8::1 eth1 br2)
+
 vnfs_terms_setup () {
   echo "VNFs and TERMs SETUP"
   for i in ${VNF[@]}; do

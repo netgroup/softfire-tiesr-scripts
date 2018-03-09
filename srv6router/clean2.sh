@@ -43,6 +43,19 @@ echoeval lxc network detach $BR_NAME $VNF_NAME
 echoeval lxc network delete $BR_NAME 
 }
 
+netns () {
+
+VNF_NAME=$1
+GW_IP=$2
+NETMASK=$3
+VNF_IP=$4
+DEV_NAME=$5
+BR_NAME=$6$1
+
+#cleaning of namespace
+
+}
+
 
 source vnfs_terms_setup.sh
 
