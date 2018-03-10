@@ -11,13 +11,14 @@ echo "############################################################"
 
 source /etc/myhostid
 
-source load_cfg_file.sh 
+source load_cfg_file.sh
 
 #INTERF_NAME="eth0"
 # Address of the management server
 MGMT=172.17.0.1
 QUAGGA_PATH="/usr/sbin"
 #QUAGGA_PATH="/usr/lib/quagga"
+RANGE_FOR_AREA_0="fd00::/8"
 
 echoeval () {
 		echo "$@"
@@ -51,10 +52,10 @@ BR_NAME=$6$1
 
 #lxc network detach brvnf vnf1
 echoeval lxc network detach $BR_NAME $VNF_NAME
-#lxc network delete brvnf1 
-echoeval lxc network delete $BR_NAME 
-#lxc network create brvnf1 ipv6.address=fd04:f1::fe/32 ipv4.address=none 
-echoeval lxc network create $BR_NAME ipv6.address=$GW_IP/$NETMASK ipv4.address=none 
+#lxc network delete brvnf1
+echoeval lxc network delete $BR_NAME
+#lxc network create brvnf1 ipv6.address=fd04:f1::fe/32 ipv4.address=none
+echoeval lxc network create $BR_NAME ipv6.address=$GW_IP/$NETMASK ipv4.address=none
 #lxc network attach brvnf1 vnf1 eth0
 echoeval lxc network attach $BR_NAME $VNF_NAME $DEV_NAME
 #lxc exec vnf1 -- ip -6 a a  fd04:f1::1/32 dev eth0
@@ -120,8 +121,8 @@ hostname $MYNAME
 password $ROUTERPWD
 log file /var/log/quagga/ospf6d.log\n
 interface lo
-ipv6 ospf6 cost ${LOOPBACK[1]}
-ipv6 ospf6 hello-interval ${LOOPBACK[2]}\n" > /etc/quagga/ospf6d.conf
+!ipv6 ospf6 cost ${LOOPBACK[1]}
+ipv6 ospf6 hello-interval 600\n" > /etc/quagga/ospf6d.conf
 
   # Iterate over the interfaces and
   # add them to the config file
@@ -143,14 +144,15 @@ ipv6 ospf6 hello-interval $quaggahellointerval\n" >> /etc/quagga/ospf6d.conf
   echo -e "router ospf6" >> /etc/quagga/ospf6d.conf
   echo -e "router-id $ROUTERID" >> /etc/quagga/ospf6d.conf
   echo -e "redistribute static" >> /etc/quagga/ospf6d.conf
-  echo -e "redistribute kernel\n" >> /etc/quagga/ospf6d.conf
 
   # Add the net to the config
-  for i in ${OSPFNET[@]}; do
-    eval quaggaannouncednet=\${${i}[0]}
-    eval quaggarouterarea=\${${i}[1]}
-    echo "area $quaggarouterarea range $quaggaannouncednet" >> /etc/quagga/ospf6d.conf
-  done
+#  for i in ${OSPFNET[@]}; do
+#    eval quaggaannouncednet=\${${i}[0]}
+#    eval quaggarouterarea=\${${i}[1]}
+#    echo "area $quaggarouterarea range $quaggaannouncednet" >> /etc/quagga/ospf6d.conf
+#  done
+  echo -e "area 0.0.0.0 range $RANGE_FOR_AREA_0" >> /etc/quagga/ospf6d.conf
+
   # Define the area of the interfaces
   echo -e "interface lo area 0.0.0.0" >> /etc/quagga/ospf6d.conf
   for i in ${TAP[@]}; do
@@ -169,12 +171,7 @@ log file /var/log/quagga/zebra.log\n
 hostname $MYNAME
 password ${ROUTERPWD}
 enable password ${ROUTERPWD}
-
-interface lo
-link-detect
-ipv6 nd ra-interval 10
-ipv6 address $LOOPBACK
-ipv6 nd prefix $LOOPBACK" > /etc/quagga/zebra.conf
+" > /etc/quagga/zebra.conf
 
   # Iterate over the interfaces and
   # add them to the config file
@@ -194,7 +191,12 @@ no ipv6 nd suppress-ra
 ipv6 nd ra-interval 10
 ipv6 address $addr
 ipv6 nd prefix $prefix" >> /etc/quagga/zebra.conf
-    done
+  done
+  for i in ${STATIC_ROUTES[@]}; do
+  echo -e "
+ipv6 route $i ::1" >> /etc/quagga/zebra.conf
+  done
+
 }
 
 # Create vxlan setup
