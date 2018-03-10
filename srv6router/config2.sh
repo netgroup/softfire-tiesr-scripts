@@ -32,11 +32,15 @@ ipv6_setup() {
   # Enable IPv6 forwarding
   sysctl -w net.ipv6.conf.all.forwarding=1
   sysctl -w net.ipv6.conf.all.seg6_enabled=1
+  sysctl -w net.ipv6.conf.all.accept_ra=0
+
   for i in ${TAP[@]}; do
     # Enable IPv6 forwarding
     sysctl -w net.ipv6.conf.$i.forwarding=1
     # Enable Seg6
     sysctl -w net.ipv6.conf.$i.seg6_enabled=1
+    # Disable accept RA
+    sysctl -w net.ipv6.conf.$i.accept_ra=0
   done
 }
 
