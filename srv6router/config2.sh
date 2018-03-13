@@ -219,12 +219,12 @@ vxlan_setup() {
     eval interface=\${${ENDIPS[j]}[1]}
     j=$((j+1))
     # Create the tunnel
-    ip link add name $i type vxlan id $vni dev $interface remote $remoteaddr dstport 4789
+    echoeval ip link add name $i type vxlan id $vni dev $interface remote $remoteaddr dstport 4789
   done
 
   # Bring up the tap interfaces
   for i in ${TAP[@]}; do
-    ip link set ${i} up
+    echoeval ip link set ${i} up
   done
 
 }
