@@ -175,6 +175,12 @@ log file /var/log/quagga/zebra.log\n
 hostname $MYNAME
 password ${ROUTERPWD}
 enable password ${ROUTERPWD}
+
+interface lo
+link-detect
+ipv6 nd ra-interval 10
+ipv6 address ${LOOPBACK[0]}
+ipv6 nd prefix ${LOOPBACK[0]}
 " > /etc/quagga/zebra.conf
 
   # Iterate over the interfaces and
