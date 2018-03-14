@@ -19,16 +19,16 @@ _CONTROLLER_DEVICE_NAME = 'eth0@if79'
 
 def serve():
 	while True:
-		os.system('python Client_srv6_ssh changesr -i ' + _ADS_2_ADDRESS + '\%' + _CONTROLLER_DEVICE_NAME + ' -p '+ _TERMINAL_4_ADDRESS + ' -s \''+ _VNF_1_ADDRESS + ',' + _SURREY_2_ADDRESS + '\' -d ' + _ADS_2_DEVICE_NAME)
+		os.system('python Client_srv6_ssh.py changesr -i ' + _ADS_2_ADDRESS + '\%' + _CONTROLLER_DEVICE_NAME + ' -p '+ _TERMINAL_4_ADDRESS + ' -s \''+ _VNF_1_ADDRESS + ',' + _SURREY_2_ADDRESS + '\' -d ' + _ADS_2_DEVICE_NAME)
 		time.sleep(_SLEEP_TIME)
 
-		os.system('python Client_srv6_ssh changesr -i ' + _ADS_2_ADDRESS + '\%' + _CONTROLLER_DEVICE_NAME + ' -p '+ _TERMINAL_4_ADDRESS + ' -s \''+ _VNF_1_ADDRESS + ',' + _VNF_2_ADDRESS + ',' + _SURREY_2_ADDRESS + '\' -d ' + _ADS_2_DEVICE_NAME)
+		os.system('python Client_srv6_ssh.py changesr -i ' + _ADS_2_ADDRESS + '\%' + _CONTROLLER_DEVICE_NAME + ' -p '+ _TERMINAL_4_ADDRESS + ' -s \''+ _VNF_1_ADDRESS + ',' + _VNF_2_ADDRESS + ',' + _SURREY_2_ADDRESS + '\' -d ' + _ADS_2_DEVICE_NAME)
 		time.sleep(_SLEEP_TIME)
 
-		os.system('python Client_srv6_ssh changesr -i ' + _ADS_2_ADDRESS + '\%' + _CONTROLLER_DEVICE_NAME + ' -p '+ _TERMINAL_4_ADDRESS + ' -s \''+ _VNF_2_ADDRESS + ',' + _SURREY_2_ADDRESS + '\' -d ' + _ADS_2_DEVICE_NAME)
+		os.system('python Client_srv6_ssh.py changesr -i ' + _ADS_2_ADDRESS + '\%' + _CONTROLLER_DEVICE_NAME + ' -p '+ _TERMINAL_4_ADDRESS + ' -s \''+ _VNF_2_ADDRESS + ',' + _SURREY_2_ADDRESS + '\' -d ' + _ADS_2_DEVICE_NAME)
 		time.sleep(_SLEEP_TIME)
 
-		os.system('python Client_srv6_ssh changesr -i ' + _ADS_2_ADDRESS + '\%' + _CONTROLLER_DEVICE_NAME + ' -p '+ _TERMINAL_4_ADDRESS + ' -s \''+ _SURREY_2_ADDRESS + '\' -d ' + _ADS_2_DEVICE_NAME)
+		os.system('python Client_srv6_ssh.py changesr -i ' + _ADS_2_ADDRESS + '\%' + _CONTROLLER_DEVICE_NAME + ' -p '+ _TERMINAL_4_ADDRESS + ' -s \''+ _SURREY_2_ADDRESS + '\' -d ' + _ADS_2_DEVICE_NAME)
 		time.sleep(_SLEEP_TIME)
 
 
