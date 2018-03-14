@@ -134,7 +134,7 @@ def get_args(functionName):
 def run(args):
 
   # Create client node
-  client = SRv6sshNode(host=args.server, name='root')
+  client = SRv6sshNode(host=args.server, name='ubuntu')
   # Not list function
   if 'list' not in args:
     prefix = args.prefix
@@ -151,14 +151,14 @@ def run(args):
     segments = args.segments
     device = args.device
 
-    command = "ip -6 route add %s encap seg6 mode %s segs %s dev %s" %(prefix, encapmode, segments, device)
+    command = "sudo ip -6 route add %s encap seg6 mode %s segs %s dev %s" %(prefix, encapmode, segments, device)
 
   elif 'del' in args:
     print ("Device : " + args.device)
 
     device = args.device
     
-    command = "ip -6 route del %s dev %s" %(prefix, device)
+    command = "sudo ip -6 route del %s dev %s" %(prefix, device)
 
   elif 'list' in args:
     command ="ip -6 route"
@@ -168,7 +168,7 @@ def run(args):
 
     via = args.via
 
-    command = "ip -6 route change %s via %s"%(prefix, via)
+    command = "sudo ip -6 route change %s via %s"%(prefix, via)
 
   elif 'changesr' in args:
     print ("Segments : " + args.segments)
@@ -177,7 +177,7 @@ def run(args):
     segments = args.segments
     device = args.device
 
-    command = "ip -6 r change %s encap seg6 mode encap segs %s dev %s" %(prefix, segments, device)
+    command = "sudo ip -6 r change %s encap seg6 mode encap segs %s dev %s" %(prefix, segments, device)
     
   client.run_command(command)
   if 'list' in args:
