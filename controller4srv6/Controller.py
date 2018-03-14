@@ -7,13 +7,14 @@ _SLEEP_TIME = 5
 _VNF_1_ADDRESS = 'fd01:f1::1'
 _VNF_2_ADDRESS = 'fd03:f1::1'
 _SURREY_2_ADDRESS = 'fdf0:0:0:2::2'
+#'fd04:1::fe/32'
 
-_TERMINAL_4_ADDRESS = 'fd04:1::3'
+_TERMINAL_4_ADDRESS = 'fd04:1::1'
 
 _ADS_2_DEVICE_NAME = 'br1term1@if24'
 _ADS_2_ADDRESS = 'fd02:1::fe'
 
-_CONTROLLER_DEVICE_NAME = ''
+_CONTROLLER_DEVICE_NAME = 'eth0@if79'
 
 
 def serve():
