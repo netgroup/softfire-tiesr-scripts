@@ -16,16 +16,16 @@ _ADS_2_ADDRESS = 'fd02:1::fe'
 
 def serve():
 	while True:
-		os.system('python Client_srv6_ssh -i ' + _ADS_2_ADDRESS + ' -p '+ _TERMINAL_4_ADDRESS + ' -s ['+ _VNF_1_ADDRESS + _SURREY_2_ADDRESS + '] -d ' + _ADS_2_DEVICE_NAME)
+		os.system('python Client_srv6_ssh changesr -i ' + _ADS_2_ADDRESS + ' -p '+ _TERMINAL_4_ADDRESS + ' -s ['+ _VNF_1_ADDRESS + _SURREY_2_ADDRESS + '] -d ' + _ADS_2_DEVICE_NAME)
 		time.sleep(_SLEEP_TIME)
 
-		os.system('python Client_srv6_ssh -i ' + _ADS_2_ADDRESS + ' -p '+ _TERMINAL_4_ADDRESS + ' -s ['+ _VNF_1_ADDRESS + _VNF_2_ADDRESS + _SURREY_2_ADDRESS + '] -d ' + _ADS_2_DEVICE_NAME)
+		os.system('python Client_srv6_ssh changesr -i ' + _ADS_2_ADDRESS + ' -p '+ _TERMINAL_4_ADDRESS + ' -s ['+ _VNF_1_ADDRESS + _VNF_2_ADDRESS + _SURREY_2_ADDRESS + '] -d ' + _ADS_2_DEVICE_NAME)
 		time.sleep(_SLEEP_TIME)
 
-		os.system('python Client_srv6_ssh -i ' + _ADS_2_ADDRESS + ' -p '+ _TERMINAL_4_ADDRESS + ' -s ['+ _VNF_2_ADDRESS + _SURREY_2_ADDRESS + '] -d ' + _ADS_2_DEVICE_NAME)
+		os.system('python Client_srv6_ssh changesr -i ' + _ADS_2_ADDRESS + ' -p '+ _TERMINAL_4_ADDRESS + ' -s ['+ _VNF_2_ADDRESS + _SURREY_2_ADDRESS + '] -d ' + _ADS_2_DEVICE_NAME)
 		time.sleep(_SLEEP_TIME)
 
-		os.system('python Client_srv6_ssh -i ' + _ADS_2_ADDRESS + ' -p '+ _TERMINAL_4_ADDRESS + ' -s ['+ _SURREY_2_ADDRESS + '] -d ' + _ADS_2_DEVICE_NAME)
+		os.system('python Client_srv6_ssh changesr -i ' + _ADS_2_ADDRESS + ' -p '+ _TERMINAL_4_ADDRESS + ' -s ['+ _SURREY_2_ADDRESS + '] -d ' + _ADS_2_DEVICE_NAME)
 		time.sleep(_SLEEP_TIME)
 
 
