@@ -6,13 +6,13 @@
 
 setup_snort () {
 #Install dependencies
-apt-get -y --force-yes update
-apt-get -y --force-yes install libpcre3 libpcre3-dev gcc flex \
+apt-get -y update
+apt-get -y install libpcre3 libpcre3-dev gcc flex \
 bison make libpcap-dev libdnet-dev libdumbnet-dev libpcre3-dev \
 libghc-zlib-dev libnghttp2-dev
 
-apt install automake
-apt install libtool
+apt -y install automake
+apt -y install libtool
 
 # Install daq
 wget https://www.snort.org/downloads/snort/daq-2.0.6.tar.gz
