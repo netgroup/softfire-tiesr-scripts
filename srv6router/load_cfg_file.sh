@@ -16,7 +16,7 @@ else
   # If cfg file is not present in current folder, we download it
   echo -e "Local configuration file not found in $(pwd)"
   echo -e "Downloading from $MGMT"
-  wget -O $CFG_FOLDER/$MYNAME.cfg $MGMT/$MYNAME.cfg 
+  wget -O $CFG_FOLDER/$MYNAME.cfg http://$MGMT:4000/static/cfg/$MYNAME.cfg
   if [ -f $CFG_FOLDER/$MYNAME.cfg ]; then
     source $CFG_FOLDER/$MYNAME.cfg
   else
