@@ -15,7 +15,9 @@ source load_cfg_file.sh
 
 #INTERF_NAME="eth0"
 # Address of the management server
-MGMT=172.17.0.1
+# the addredss of the management server now is in /etc/myhostid
+#MGMT=172.17.0.1
+
 QUAGGA_PATH="/usr/sbin"
 #QUAGGA_PATH="/usr/lib/quagga"
 RANGE_FOR_AREA_0="fd00::/8"
