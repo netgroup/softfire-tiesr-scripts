@@ -70,6 +70,12 @@ echoeval lxc exec $VNF_NAME -- ip -6 a a  $VNF_IP/$NETMASK dev $DEV_NAME
 echoeval lxc exec $VNF_NAME -- ip -6 r a default via $GW_IP dev $DEV_NAME
 #lxc exec vnf1 -- ip link set dev eth0 up
 echoeval lxc exec $VNF_NAME -- ip link set dev $DEV_NAME up
+#lxc exec vnf1 -- sysctl -w net.ipv6.conf.all.forwarding=1
+echoeval lxc exec $VNF_NAME -- sysctl -w net.ipv6.conf.all.forwarding=1
+#lxc exec vnf1 -- sysctl -w net.ipv6.conf.all.seg6_enabled=1
+echoeval lxc exec $VNF_NAME -- sysctl -w net.ipv6.conf.all.seg6_enabled=1
+#lxc exec vnf1 -- sysctl -w net.ipv6.conf.eth0.seg6_enabled=1
+echoeval lxc exec $VNF_NAME -- sysctl -w net.ipv6.conf.eth0.seg6_enabled=1
 #sudo ip link set dev vnfbr1 up
 echoeval sudo ip link set dev $BR_NAME up
 }
