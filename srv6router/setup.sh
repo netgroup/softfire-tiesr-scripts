@@ -103,9 +103,6 @@ echo -e "Ok!"
 # Create setup file
 touch /etc/setup
 
-echo -e 'MYNAME="ADS1"' > /etc/myhostid
-echo -e 'MGMT=172.17.0.1' >> /etc/myhostid
-
 echo -e "\nSRv6 Router node setup ended succesfully. Enjoy!\n"
 
 
