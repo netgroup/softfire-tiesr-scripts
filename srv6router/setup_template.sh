@@ -10,4 +10,4 @@ wget -O /home/ubuntu/tiesr/$MYFILE http://{{token_ip_mgmt}}:4000/static/softfire
 chmod +x /home/ubuntu/tiesr/$MYFILE
 done
 chown ubuntu:ubuntu -R /home/ubuntu/tiesr/ 
-/home/ubuntu/tiesr/setup.sh
+sudo /home/ubuntu/tiesr/setup.sh
