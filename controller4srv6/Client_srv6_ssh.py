@@ -173,13 +173,14 @@ def run(args):
   elif 'changesr' in args:
     print ("Segments : " + args.segments)
     print ("Device : " + args.device)
-    
+    fdff::2/128
     segments = args.segments
     device = args.device
 
     command = "sudo ip -6 r change %s encap seg6 mode encap segs %s dev %s" %(prefix, segments, device)
     
   client.run_command(command)
+  print client.data
   if 'list' in args:
     print client.data
 
