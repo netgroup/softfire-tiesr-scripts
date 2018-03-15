@@ -75,7 +75,7 @@ echoeval lxc exec $VNF_NAME -- sysctl -w net.ipv6.conf.all.forwarding=1
 #lxc exec vnf1 -- sysctl -w net.ipv6.conf.all.seg6_enabled=1
 echoeval lxc exec $VNF_NAME -- sysctl -w net.ipv6.conf.all.seg6_enabled=1
 #lxc exec vnf1 -- sysctl -w net.ipv6.conf.eth0.seg6_enabled=1
-echoeval lxc exec $VNF_NAME -- sysctl -w net.ipv6.conf.eth0.seg6_enabled=1
+echoeval lxc exec $VNF_NAME -- sysctl -w net.ipv6.conf.${DEV_NAME}.seg6_enabled=1
 #sudo ip link set dev vnfbr1 up
 echoeval sudo ip link set dev $BR_NAME up
 }
@@ -97,6 +97,9 @@ echoeval ip netns exec ${VNF_NAME} sysctl -w net.ipv6.conf.all.forwarding=1
 echoeval ip -6 addr add ${GW_IP}/${NETMASK} dev ${BR_NAME}
 echoeval ip netns exec ${VNF_NAME} ip -6 addr add ${VNF_IP}/${NETMASK} dev ${DEV_NAME}
 echoeval ip netns exec ${VNF_NAME} ip -6 route add default via ${GW_IP}
+echoeval ip netns exec ${VNF_NAME} sysctl -w net.ipv6.conf.all.forwarding=1
+echoeval ip netns exec ${VNF_NAME} sysctl -w net.ipv6.conf.all.seg6_enabled=1
+echoeval ip netns exec ${VNF_NAME} sysctl -w net.ipv6.conf.${DEV_NAME}.seg6_enabled=1
 }
 
 
